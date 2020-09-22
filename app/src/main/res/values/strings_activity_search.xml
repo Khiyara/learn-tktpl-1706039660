@@ -1,0 +1,4 @@
+<resources>
+    <!-- Strings related to login -->
+    <string name="text_placeholder">Name</string>
+</resources>

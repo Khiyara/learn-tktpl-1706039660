@@ -1,1 +1,7 @@
 /build
+.app
+.build
+.env
+env
+.gradle
+.idea

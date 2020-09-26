@@ -1,4 +1,4 @@
-<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.Lab2.view.WelcomeView xmlns:android="http://schemas.android.com/apk/res/android"
+<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.WelcomeView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/welcome"
     android:layout_width="match_parent"
@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:focusable="true"
-    tools:context=".Lab2.activity.implementation.WelcomeActivity">
+    tools:context=".activity.implementation.WelcomeActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -24,4 +24,4 @@
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
         android:text="@string/search_button_placeholde" />
-</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.Lab2.view.WelcomeView>
+</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.WelcomeView>

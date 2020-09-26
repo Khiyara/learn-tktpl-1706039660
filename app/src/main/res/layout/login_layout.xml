@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.Lab2.view.LoginView
+<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.LoginView
     android:id="@+id/login"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -32,4 +32,4 @@
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
         android:text="@string/action_sign_in_register" />
-</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.Lab2.view.LoginView>
+</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.LoginView>

@@ -31,7 +31,12 @@ public class MainController implements View.OnClickListener {
                 Log.i(TAG, "[+] Notification Button Clicked");
                 this.getListener().onNotificationButtonClick();
                 break;
+            case R.id.countdown_button:
+                Log.i(TAG, "[+] Countdown Timer Button Clicked");
+                this.getListener().onCountdownTimerButtonClick();
+                break;
             default:
+                Log.i(TAG, "[+] Search Button Clicked");
                 this.getListener().onSearchButtonClick();
                 break;
         }

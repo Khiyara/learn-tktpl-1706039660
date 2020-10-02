@@ -15,5 +15,6 @@ public class MainView extends LinearLayout {
     public void setListeners(OnClickListener onClickListener){
         findViewById(R.id.search_page_button).setOnClickListener(onClickListener);
         findViewById(R.id.notification_view_button).setOnClickListener(onClickListener);
+        findViewById(R.id.countdown_button).setOnClickListener(onClickListener);
     }
 }

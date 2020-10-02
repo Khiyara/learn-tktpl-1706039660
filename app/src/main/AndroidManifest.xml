@@ -23,7 +23,10 @@
             android:name=".activity.implementation.SearchActivity"
             android:label="SearchActivity" >
         </activity>
-        <receiver android:name=".NotificationReceiver"/>
+        <activity
+            android:name=".activity.implementation.TimerActivity"
+            android:label="TimerActivity" >
+        </activity>
     </application>
 
 </manifest>

@@ -31,6 +31,12 @@ public class MainActivity extends Activity implements MainControllerListener {
     }
 
     @Override
+    public void onCountdownTimerButtonClick() {
+        Intent intent = new Intent(this, TimerActivity.class);
+        this.startActivity(intent);
+    }
+
+    @Override
     public void onNotificationButtonClick() {
         Toast toast = Toast.makeText(getApplicationContext(), "This feature not implemented yet", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.TOP, 0, 0);

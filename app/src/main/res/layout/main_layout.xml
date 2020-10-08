@@ -1,4 +1,4 @@
-<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.WelcomeView xmlns:android="http://schemas.android.com/apk/res/android"
+<id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.MainView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/welcome"
     android:layout_width="match_parent"
@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:padding="20dp"
     android:focusable="true"
-    tools:context=".activity.implementation.WelcomeActivity">
+    tools:context=".activity.implementation.MainActivity">
 
     <TextView
         android:layout_width="match_parent"
@@ -24,4 +24,15 @@
         android:paddingLeft="32dp"
         android:paddingRight="32dp"
         android:text="@string/search_button_placeholde" />
-</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.WelcomeView>
+
+    <Button
+        android:id="@+id/notification_view_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="16dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="32dp"
+        android:text="Notification List" />
+
+</id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.MainView>

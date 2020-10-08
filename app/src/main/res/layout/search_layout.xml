@@ -41,36 +41,50 @@
         android:textSize="20sp">
 
     </androidx.appcompat.widget.SwitchCompat>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" >
+        <Button
+            android:id="@+id/notification_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:text="Create Reminder ?" />
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginTop="16dp"
+            android:paddingLeft="32dp"
+            android:paddingRight="32dp"
+            android:text="@string/search_button_placeholde" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_marginTop="16dp"
-        android:paddingLeft="32dp"
-        android:paddingRight="32dp"
-        android:text="@string/search_button_placeholde" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-    <ScrollView
-        android:id="@+id/searchView_db"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/linearLayout1" >
-
-        <LinearLayout
+        <ListView
+            android:id="@+id/textView_fetched_results"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical" >
+            android:textSize="20sp"
+            android:linksClickable="true"/>
+    </LinearLayout>
 
-            <TextView
-                android:id="@+id/textView_fetched_results"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:textSize="20sp" />
-        </LinearLayout>
-    </ScrollView>
+    <TextView
+        android:id="@+id/mal_id_state"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        >
+    </TextView>
 
 </id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.SearchView>

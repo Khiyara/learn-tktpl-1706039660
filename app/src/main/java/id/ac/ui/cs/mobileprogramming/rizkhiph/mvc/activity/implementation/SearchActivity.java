@@ -2,9 +2,7 @@ package id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.activity.implementation;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,7 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
+
+import com.google.gson.Gson;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,14 +27,19 @@ import java.util.ArrayList;
 
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.R;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.activity.SearchControllerListener;
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.common.NotificationInterface;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.controller.SearchController;
-import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.service.NotificationInterface;
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.model.Content;
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.model.ListContent;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.service.NotificationService;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.view.SearchView;
 
 public class SearchActivity extends Activity implements SearchControllerListener, NotificationInterface {
     private static final String TAG = "Search Activity";
-    private NotificationService notificationService = new NotificationService();
+    public static final int NOTIFICATION_ID = 5;
+    public static final String SHARED_PREFERENCES = "Search";
+
+    private NotificationService notificationService = new NotificationService(this, this, this);
 
     public SearchActivity() {}
 
@@ -49,8 +53,21 @@ public class SearchActivity extends Activity implements SearchControllerListener
 
         SearchController searchController = new SearchController((SearchView) this.findViewById(R.id.search), this);
         ((SearchView) this.findViewById(R.id.search)).setListeners(searchController);
+
+        SharedPreferences mPrefs = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String content = mPrefs.getString("Content", "");
+        if (content.equals("")) {
+            Log.i(TAG, "[+] Shared Preferences is Empty Adding ListContent Object");
+            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+            ListContent listContent = new ListContent();
+            Gson gson = new Gson();
+            String json = gson.toJson(listContent);
+            prefsEditor.putString("Content", json);
+            prefsEditor.apply();
+        }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @SuppressLint("ShowToast")
     @Override
     public void onCreateNotification() {
@@ -64,14 +81,47 @@ public class SearchActivity extends Activity implements SearchControllerListener
         String title = dateTime[2];
         String airing = dateTime[dateTime.length - 1];
         Toast toast;
+        String text = title + " new episode is release now";
         if (!airing.equals("false")) {
-            this.getNotificationService().createNotification(date, time, title, this);
+            this.getNotificationService().createNotification(date, time, text, title, NOTIFICATION_ID);
+            Content content = new Content(dateTime[0], title, time, date);
+            this.setContents(content);
             toast = Toast.makeText(getApplicationContext(), title + " will be remineded at " + date + " " + time, Toast.LENGTH_LONG);
         } else {
             toast = Toast.makeText(getApplicationContext(), title + " is not airing", Toast.LENGTH_LONG);
         }
         toast.setGravity(Gravity.TOP, 0, 0);
         toast.show();
+    }
+
+    public void saveToPreferences(ListContent listContent) {
+        SharedPreferences preferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(listContent);
+        Log.i(TAG, "[+] JSON " + json);
+        prefsEditor.putString("Content", json);
+        prefsEditor.apply();
+    }
+
+    public void setContents(Content content) {
+        SharedPreferences preferences = getSharedPreferences(SHARED_PREFERENCES, MODE_PRIVATE);
+        String json = preferences.getString("Content", "");
+        Log.i(TAG, "[+] JSON now " + json);
+        Gson gson = new Gson();
+        ListContent obj = gson.fromJson(json, ListContent.class);
+        boolean isInSharedPreferences = false;
+        for (int i = 0; i < obj.getContents().size(); i++) {
+            if (obj.getContents().get(i).getId().equals(content.getId())) {
+                isInSharedPreferences = true;
+                break;
+            }
+        }
+        if (!isInSharedPreferences) {
+            Log.i(TAG, "[+] Adding ID " + content.getId());
+            obj.getContents().add(content);
+        }
+        this.saveToPreferences(obj);
     }
 
     @Override
@@ -169,32 +219,8 @@ public class SearchActivity extends Activity implements SearchControllerListener
         return notificationService;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onReceive(String result) {
-        Log.i(TAG, "[+] Pushing Notification");
-        String channelId = createNotificationChannel(this);
-
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, channelId);
-        notificationBuilder.setSmallIcon(R.drawable.ic_launcher_background)
-                .setContentText(result + " new episode is relese")
-                .setContentTitle(result);
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(1, notificationBuilder.build());
-        Log.i(TAG, "[+] Done Pushing Notification");
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public String createNotificationChannel(Context context) {
-        String channelId = "ReminderNotification";
-        String channelName = "MVC";
-        int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
-        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, channelImportance);
-        notificationChannel.setDescription("Reminder");
-        notificationChannel.enableVibration(false);
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(notificationChannel);
-
-        return channelId;
+    public void onPushNotification() {
+        //
     }
 }

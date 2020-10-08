@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.widget.Toast;
 
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.R;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.activity.MainControllerListener;
@@ -31,16 +29,9 @@ public class MainActivity extends Activity implements MainControllerListener {
     }
 
     @Override
-    public void onCountdownTimerButtonClick() {
-        Intent intent = new Intent(this, TimerActivity.class);
-        this.startActivity(intent);
-    }
-
-    @Override
     public void onNotificationButtonClick() {
-        Toast toast = Toast.makeText(getApplicationContext(), "This feature not implemented yet", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();
+        Intent intent = new Intent(this, ContentListActivity.class);
+        this.startActivity(intent);
     }
 
     @Override

@@ -1,102 +1,146 @@
 package id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.service;
 
-import android.os.AsyncTask;
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import java.util.Calendar;
 
-public class NotificationService {
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.R;
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.common.NotificationInterface;
+import id.ac.ui.cs.mobileprogramming.rizkhiph.mvc.common.NotificationPublisher;
+
+public class NotificationService implements NotificationInterface {
     private final String TAG = "Notification Service";
 
-    public NotificationService() {};
+    private Context context;
+    private Activity activity;
+    private NotificationInterface service;
 
-    public void createNotification(String date, String time, String title, final NotificationInterface service) {
-        Log.i(TAG, "[+] On Create Notification");
-        BackgroundNotification notif = new BackgroundNotification(new BackgroundNotification.AsyncResponse() {
-            @Override
-            public void processFinish(String title) {
-                Log.i(TAG, "[+] Push notification now");
-                service.onReceive(title);
-            }
-        }, date, time, title);
-
-        notif.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    public NotificationService(Context context, Activity activity, NotificationInterface service) {
+        this.context = context;
+        this.activity = activity;
+        this.service = service;
     }
 
-    private static class BackgroundNotification extends AsyncTask<Void, Void, String> {
-        private static final String TAG = "Background Notification";
-        AsyncResponse delegate;
-        String date;
-        String time;
-        String title;
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void createNotification(String date, String time, String text,
+                                   String title, int notificationId) {
+        Log.i(TAG, "[+] On Create Notification");
+        Long dateToTrigger = parseDate(date, time);
+        Log.i(TAG, "[+] Notification will be trigger at " + (dateToTrigger));
 
-        public BackgroundNotification(AsyncResponse delegate, String date, String time, String title) {
-            this.delegate = delegate;
-            this.date = date;
-            this.time = time;
-            this.title = title;
-        }
+        this.buildNotification(text, title, dateToTrigger, notificationId);
+    }
 
-        public interface AsyncResponse {
-            void processFinish(String title);
-        }
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void buildNotification(String text, String title, long timeToTrigger, int notificationId) {
+        Log.i(TAG, "[+] Building Notification");
+        String channelId = createNotificationChannel(this.getContext());
 
-        @Override
-        protected String doInBackground(Void... voids) {
-            Long now = System.currentTimeMillis();
-            Long dateToTrigger = parseDate(this.date, this.time);
-            try {
-                Log.i(TAG, "[+] Background process created for " + (dateToTrigger - now));
-                Thread.sleep((dateToTrigger - now));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return this.title;
-        }
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this.getContext(), channelId);
+        notificationBuilder.setSmallIcon(R.drawable.ic_launcher_background)
+                .setContentText(text)
+                .setContentTitle(title);
 
-        @Override
-        protected void onPostExecute(String title) {
-            this.delegate.processFinish(title);
-        }
+        Intent intent = new Intent(this.getContext(), this.getActivity().getClass());
+        PendingIntent activity = PendingIntent.getActivity(this.getContext(), notificationId,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setContentIntent(activity);
 
-        public Long parseDate(String date, String time) {
-            Calendar calendar = Calendar.getInstance();
-            int day = calendar.get(Calendar.DATE);
-            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            int month = calendar.get(Calendar.MONTH);
-            int year = calendar.get(Calendar.YEAR);
-            int dayToTrigger = dateToInt(date);
-            String[] timeToTrigger = time.split(":");
-            int hourToTrigger = Integer.parseInt(timeToTrigger[0]);
-            int minuteToTrigger = Integer.parseInt(timeToTrigger[1]);
-            calendar.set(year, month,
-                    dayToTrigger < dayOfWeek ?
-                    day + (dayToTrigger + 7 - dayOfWeek) :
-                    day + (dayToTrigger - dayOfWeek),
-                    hourToTrigger + 7, minuteToTrigger
-            );
-            return calendar.getTimeInMillis();
-        }
+        Notification notification = notificationBuilder.build();
 
-        public int dateToInt(String date) {
-            switch (date) {
-                case "Sundays":
-                    return 1;
-                case "Mondays":
-                    return 2;
-                case "Tuesdays":
-                    return 3;
-                case "Wednesdays":
-                    return 4;
-                case "Thursdays":
-                    return 5;
-                case "Fridays":
-                    return 6;
-                case "Saturdays":
-                    return 7;
-                default:
-                    return 1;
-            }
+        Intent notificationIntent = new Intent(this.getContext(), NotificationPublisher.class);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, notificationId);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getContext(), notificationId,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Log.i(TAG, "[+] Will be notified at " + timeToTrigger);
+        AlarmManager alarmManager = (AlarmManager) this.getContext().getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeToTrigger, pendingIntent);
+
+        Log.i(TAG, "[+] Done Building Notification");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String createNotificationChannel(Context context) {
+        String channelId = "ReminderNotification";
+        String channelName = "MVC";
+        int channelImportance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel notificationChannel = new NotificationChannel(channelId, channelName, channelImportance);
+        notificationChannel.setDescription("Reminder");
+        notificationChannel.enableVibration(false);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel);
+
+        return channelId;
+    }
+
+    public Long parseDate(String date, String time) {
+        Calendar calendar = Calendar.getInstance();
+        int day = calendar.get(Calendar.DATE);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+        int dayToTrigger = dateToInt(date);
+        String[] timeToTrigger = time.split(":");
+        int hourToTrigger = Integer.parseInt(timeToTrigger[0]);
+        int minuteToTrigger = Integer.parseInt(timeToTrigger[1]);
+        calendar.set(year, month,
+                dayToTrigger < dayOfWeek ?
+                        day + (dayToTrigger + 7 - dayOfWeek) :
+                        day + (dayToTrigger - dayOfWeek),
+                hourToTrigger + 7, minuteToTrigger
+        );
+        return calendar.getTimeInMillis();
+    }
+
+    public int dateToInt(String date) {
+        switch (date) {
+            case "Sundays":
+                return 1;
+            case "Mondays":
+                return 2;
+            case "Tuesdays":
+                return 3;
+            case "Wednesdays":
+                return 4;
+            case "Thursdays":
+                return 5;
+            case "Fridays":
+                return 6;
+            case "Saturdays":
+                return 7;
+            default:
+                return 1;
         }
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public NotificationInterface getService() {
+        return service;
+    }
+
+    @Override
+    public void onPushNotification() {
+        this.getService().onPushNotification();
     }
 }

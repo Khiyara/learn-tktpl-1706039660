@@ -24,9 +24,11 @@
             android:label="SearchActivity" >
         </activity>
         <activity
-            android:name=".activity.implementation.TimerActivity"
-            android:label="TimerActivity" >
+            android:name=".activity.implementation.ContentListActivity"
+            android:theme="@style/MaterialComponents"
+            android:label="ContentListActivity" >
         </activity>
+        <receiver android:name=".common.NotificationPublisher"></receiver>
     </application>
 
 </manifest>

@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+-keepclassmembers class android.renderscript.RenderScript {
+  native *** rsn*(...);
+  native *** n*(...);
+}
+
+-keep abstract class id.ac.ui.cs.mobileprogramming.rizkhiph.lab.model.AccessPoint{
+    *;
+}
+
+-keep abstract class id.ac.ui.cs.mobileprogramming.rizkhiph.lab.JniManager{
+    *;
+}
+

@@ -14,6 +14,31 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:layout_height="100dp"
+                android:layout_width="match_parent"
+                android:hint="Name Access Point"
+                android:id="@+id/dummy_name_acp"/>
+
+            <EditText
+                android:layout_height="100dp"
+                android:layout_width="match_parent"
+                android:hint="Custom BSSID"
+                android:id="@+id/dummy_mac_acp"/>
+
+            <EditText
+                android:id="@+id/dummy_strength_acp"
+                android:inputType="number"
+                android:hint="Custom Signal Strength"
+                android:layout_height="100dp"
+                android:layout_width="match_parent" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

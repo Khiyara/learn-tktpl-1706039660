@@ -37,6 +37,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import id.ac.ui.cs.mobileprogramming.rizkhiph.lab.JniManager;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.lab.MainActivity;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.lab.common.constant.EndpointDummy;
 import id.ac.ui.cs.mobileprogramming.rizkhiph.lab.databinding.ListWifiFragmentBinding;
@@ -57,6 +58,12 @@ public class ListWifiFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             List<ScanResult> scanResults = wifiManager.getScanResults();
             List<AccessPoint> accessPoints = new ArrayList<>();
+            JniManager jniManager = new JniManager();
+            AccessPoint dummyAccessPoint = jniManager.createAccessPointInfo();
+            String dummyName = String.valueOf(binding.dummyNameAcp.getText());
+            String dummyMac = String.valueOf(binding.dummyNameAcp.getText());
+            int dummyStrength = Integer.parseInt(String.valueOf(binding.dummyStrengthAcp.getText()));
+            AccessPoint dummyAccessPointCPP = jniManager.nGetAccessPointInfo(dummyName, dummyMac, dummyStrength);
             for (int i = 0; i < scanResults.size(); i++) {
                 String name = scanResults.get(i).SSID;
                 String mac = scanResults.get(i).BSSID;
@@ -65,6 +72,8 @@ public class ListWifiFragment extends Fragment {
                 AccessPoint accessPoint = new AccessPoint(name, mac, strength);
                 accessPoints.add(accessPoint);
             }
+            accessPoints.add(dummyAccessPoint);
+            accessPoints.add(dummyAccessPointCPP);
             viewModel.setScanResults(accessPoints);
         }
     };
@@ -85,9 +94,10 @@ public class ListWifiFragment extends Fragment {
                 final LocationManager manager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
                 if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     alertTurnOnGps();
+                } else {
+                    Log.d(TAG, "[+] Scanning");
+                    wifiManager.startScan();
                 }
-                Log.d(TAG, "[+] Scanning");
-                wifiManager.startScan();
             }
         });
         binding.sendButton.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +148,7 @@ public class ListWifiFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.e(TAG, "[-] Error Getting Response");
-                        Toast toast = Toast.makeText(getContext(), "Success Posting Data", Toast.LENGTH_LONG);
+                        Toast toast = Toast.makeText(getContext(), "Failed Posting Data", Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.TOP, 0, 0);
                         toast.show();
                     }
@@ -152,7 +162,7 @@ public class ListWifiFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(ListWifiViewModel.class);
 
         subscribe(viewModel.getScanResults());
-        wifiManager.startScan();
+//        wifiManager.startScan();
     }
 
     private void subscribe(LiveData<List<AccessPoint>> liveData) {

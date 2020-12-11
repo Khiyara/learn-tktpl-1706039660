@@ -1,4 +1,4 @@
-package id.ac.ui.cs.mobileprogramming.rizkhiph.mvc;
+package id.ac.ui.cs.mobileprogramming.rizkhiph.lab;
 
 import org.junit.Test;
 
